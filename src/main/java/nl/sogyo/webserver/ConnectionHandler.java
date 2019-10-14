@@ -35,7 +35,14 @@ public class ConnectionHandler implements Runnable {
             e.printStackTrace();
         } finally {
             // After handling the request, we can close our socket.
-            socket.close();
+            try
+			{
+				socket.close();
+			} catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 
