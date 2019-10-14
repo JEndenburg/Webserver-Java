@@ -18,12 +18,9 @@ public class ConnectionHandler implements Runnable {
 
             // Set up a reader that can conveniently read our incoming bytes as lines of text.
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String line = null;
-            do {
-                // Read the incoming message line by line and echo is to the system out.
-                line = reader.readLine();
-                System.out.println(line);
-            } while (!line.isEmpty());
+            Request request = parseRequest(reader);
+            
+            System.out.println("Parsed Request: " + request);
             
             // Set up a writer that can write text to our binary output stream.
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -44,6 +41,42 @@ public class ConnectionHandler implements Runnable {
 				e.printStackTrace();
 			}
         }
+    }
+    
+    private Request parseRequest(BufferedReader reader) throws IOException
+    {
+    	String line = null;
+    	ParsingPhase currentPhase = ParsingPhase.MethodCall;
+    	Request.Builder requestBuilder = new Request.Builder();
+    	do
+    	{
+    		line = reader.readLine();
+    		System.out.println(line);
+    		
+    		switch(currentPhase)
+    		{
+    		case MethodCall:
+    			String[] methodCallParts = line.split(" ");
+    			requestBuilder.setHttpMethod(methodCallParts[0]);
+    			requestBuilder.setUrl(methodCallParts[1]);
+    			currentPhase = ParsingPhase.Headers;
+    			break;
+    		case Headers:
+    			requestBuilder.addHeader(line);
+    			break;
+    		}
+    	} while (!line.isEmpty());
+    	
+    	return requestBuilder.build();
+    }
+    
+    private static enum ParsingPhase
+    {
+    	MethodCall,
+    	Headers,
+    	Body,
+    	
+    	Unknown,
     }
 
     public static void main(String... args) {

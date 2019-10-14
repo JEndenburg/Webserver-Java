@@ -1,5 +1,6 @@
 package nl.sogyo.webserver;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,5 +62,59 @@ public class Request
     public String getParameterValue(String name)
     {
     	return urlParameters.get(name);
+    }
+    
+    @Override
+    public String toString()
+    {
+    	return String.format("%s %s\nURL Params: %s\nHeader Params: %s", method.toString(), resourcePath.toString(), urlParameters.toString(), headerParameters.toString());
+    }
+    
+    public static class Builder
+    {
+    	private HttpMethod httpMethod;
+    	private String url;
+    	private Map<String, String> headerParameters = new HashMap<String, String>();
+    	
+    	public void setHttpMethod(String httpMethod)
+    	{
+    		this.httpMethod = HttpMethod.parse(httpMethod);
+    	}
+    	
+    	public void setUrl(String url)
+    	{
+    		this.url = url;
+    	}
+    	
+    	public void addHeader(String header)
+    	{
+    		String[] headerKVSplit = header.split(":");
+    		if(headerKVSplit.length == 2)
+    			headerParameters.put(headerKVSplit[0].strip(), headerKVSplit[1].strip());
+    	}
+    	
+    	private Map<String, String> getUrlParameterMap(String parameterString)
+    	{
+    		Map<String, String> urlParameterMap = new HashMap<String, String>();
+    		if(parameterString.isBlank())
+    			return urlParameterMap;
+    		
+    		String[] parameterKVPairs = parameterString.replace("%20", " ").split("&");
+    		for(String kvPairConcat : parameterKVPairs)
+    		{
+    			String[] kvPairSplit = kvPairConcat.split("=");
+    			if(kvPairSplit.length == 2)
+    				urlParameterMap.put(kvPairSplit[0], kvPairSplit[1]);
+    		}
+    		
+    		return urlParameterMap;
+    	}
+    	
+    	public Request build()
+    	{
+    		String[] resourcePathAndParameters = url.split("\\?");
+    		Map<String, String> urlParameters = resourcePathAndParameters.length > 1 ? getUrlParameterMap(resourcePathAndParameters[1]) : new HashMap<String, String>();
+    		return new Request(httpMethod, resourcePathAndParameters[0], headerParameters, urlParameters);
+    	}
     }
 }
