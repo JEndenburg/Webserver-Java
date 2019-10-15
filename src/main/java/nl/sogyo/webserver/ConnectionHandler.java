@@ -7,6 +7,7 @@ import java.net.Socket;
 import nl.sogyo.webserver.input.Request;
 import nl.sogyo.webserver.input.RequestReader;
 import nl.sogyo.webserver.output.Response;
+import nl.sogyo.webserver.output.ResponseFetcher;
 import nl.sogyo.webserver.output.ResponseSender;
 
 public class ConnectionHandler implements Runnable 
@@ -24,8 +25,7 @@ public class ConnectionHandler implements Runnable
         try {
         	
         	Request request = RequestReader.parseRequestFromStream(socket.getInputStream());
-            System.out.println("Parsed Request: " + request);
-            Response response = new Response(HttpStatusCode.OK, ContentType.HTML, "<HTML><body><p>Hello World You requested " + request.getResourcePath() + "!</p></body></HTML>");
+        	Response response = ResponseFetcher.fetch(request, serverProperties);
             ResponseSender.sendResponse(response, socket.getOutputStream());
 
         } catch (IOException e) {

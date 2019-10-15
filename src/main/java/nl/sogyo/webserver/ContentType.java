@@ -6,7 +6,10 @@ public enum ContentType
 	CSS("text", "css"),
 	JavaScript("text", "javascript"),
 	HTML("text", "html"),
-	JSON("application", "json");
+	JSON("application", "json"),
+	JPEG("image", "jpg"),
+	PNG("image", "png"),
+	GIF("image", "gif");
 	
 	private final String type;
 	private final String subType;
@@ -15,6 +18,11 @@ public enum ContentType
 	{
 		this.type = type;
 		this.subType = subType;
+	}
+	
+	public String getType()
+	{
+		return type;
 	}
 	
 	@Override

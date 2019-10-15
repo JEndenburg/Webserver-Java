@@ -15,8 +15,8 @@ public class ResponseSender
 		writeStatusCode(response, writer);
 		writeHeaders(response, writer);
 		writer.newLine();
-		writer.write(response.getContent());
 		writer.flush();
+		outputStream.write(response.getContent());
 	}
 	
 	private static void writeStatusCode(Response response, BufferedWriter writer) throws IOException
@@ -30,9 +30,12 @@ public class ResponseSender
 	private static void writeHeaders(Response response, BufferedWriter writer) throws IOException
 	{
 		writer.write(getHeaderString("date", response.getDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
-		writer.write(getHeaderString("content-length", response.getContent().length()));
+		writer.write(getHeaderString("content-length", response.getContent().length));
 		writer.write(getHeaderString("content-type", response.getContentType()));
 		writer.write(getHeaderString("connection", "close"));
+		
+		if(response.getContentType().getType().equalsIgnoreCase("image"))
+			writer.write(getHeaderString("accept-ranges", "bytes"));
 		
 		Map<String, String> customHeaders = response.getCustomHeaders();
 		for(String headerKey : customHeaders.keySet())

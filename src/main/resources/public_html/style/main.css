@@ -1,0 +1,56 @@
+:root
+{
+    --primary-color: rgb(250, 140, 20);
+    --secondary-color: rgb(170, 125, 50);
+    color: rgb(40, 40, 80);
+}
+
+body
+{
+    margin: 0px;
+    background-color: var(--primary-color);
+    font-family: sans-serif;
+}
+
+header
+{
+    position: fixed;
+    height: 10vh;
+    background-color: var(--secondary-color);
+    width: 100%;
+    top: 0px;
+}
+
+header #sitename
+{
+    margin: 8px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: rgb(240, 240, 255);
+}
+
+main
+{
+    margin-top: 20vh;
+}
+
+article
+{
+    background-color: var(--secondary-color);
+    border-radius: 15px;
+    width: 70vw;
+    margin: auto;
+    padding: 10px;
+}
+
+article .article-title
+{
+    color: rgb(240, 240, 255);
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+article img
+{
+    border-radius: 10px;
+}

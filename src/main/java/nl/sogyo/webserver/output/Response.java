@@ -15,10 +15,10 @@ public class Response
 	private final ZonedDateTime date;
 	private final HttpStatusCode statusCode;
 	private Map<String, String> customHeaders;
-	private final String content;
+	private final byte[] content;
 	private final ContentType contentType;
 	
-	public Response(HttpStatusCode statusCode, ContentType contentType, String content)
+	public Response(HttpStatusCode statusCode, ContentType contentType, byte[] content)
 	{
 		if(content == null)
 			throw new IllegalArgumentException("Content can't be null!");
@@ -31,7 +31,7 @@ public class Response
 	
 	public Response(HttpStatusCode statusCode, ContentType contentType)
 	{
-		this(statusCode, contentType, "");
+		this(statusCode, contentType, new byte[0]);
 	}
 	
 	public void addHeader(String key, String value)
@@ -67,7 +67,7 @@ public class Response
     /// Optionally, a response contains content. If we want
     /// to transfer for example a web page, we add the HTML contents
     /// in the body of the response.
-    public String getContent()
+    public byte[] getContent()
     {
     	return content;
     }
