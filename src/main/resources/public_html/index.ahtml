@@ -13,6 +13,11 @@
                 <div class="article-content">
                     <img src="img/cat.jpg">
                     So yeah, welcome to my site. My name is DJ Fluffypuffkins.
+                    <%
+                        PRINT "<div class=\"result\">"
+                        PRINT $URL_PAR 0
+                        PRINT "</div>"
+                    %>
                 </div>
             </article>
         </main>

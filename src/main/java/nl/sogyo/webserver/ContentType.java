@@ -5,6 +5,7 @@ public enum ContentType
 	PlainText("text", "plain"),
 	CSS("text", "css"),
 	JavaScript("text", "javascript"),
+	AHTML("text", "html"),
 	HTML("text", "html"),
 	JSON("application", "json"),
 	JPEG("image", "jpg"),

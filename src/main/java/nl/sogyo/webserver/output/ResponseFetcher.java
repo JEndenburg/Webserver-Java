@@ -12,20 +12,23 @@ import nl.sogyo.webserver.ContentType;
 import nl.sogyo.webserver.HttpStatusCode;
 import nl.sogyo.webserver.ServerProperties;
 import nl.sogyo.webserver.input.Request;
+import nl.sogyo.webserver.processing.AHTMLProcessor;
 
 public class ResponseFetcher
 {
+	private static final String[] indexExtensions = {".html", ".php", ".shtml", ".ahtml"};
+	
 	public static Response fetch(Request request, ServerProperties properties)
 	{
 		String resourcePath = properties.rootFolder + request.getResourcePath();
-		Response response = fetch(resourcePath);
+		Response response = fetch(resourcePath, request);
 		if(response == null)
 			return getErrorResponse(HttpStatusCode.NotFound);
 		else
 			return response;
 	}
 	
-	private static Response fetch(String resourcePath)
+	private static Response fetch(String resourcePath, Request request)
 	{
 		URL resourceURL = ResponseFetcher.class.getClassLoader().getResource(resourcePath);
 		if(resourceURL == null)
@@ -35,18 +38,33 @@ public class ResponseFetcher
 		File file = new File(localResourcePath);
 		
 		if(file.isDirectory())
-			file = new File(localResourcePath + "index.html");
+		{
+			int index = 0;
+			do
+			{
+				file = new File(localResourcePath + "index" + indexExtensions[index]);
+				index++;
+			}
+			while(index < indexExtensions.length && !file.exists());
+		}
 		
 		if(file.exists())
 		{
 			Response response = null;
 			try
 			{
-				response = new Response(
-					HttpStatusCode.OK,
-					determineContentType(file),
-					getFileContents(file.toPath())
-					);
+				ContentType contentType = determineContentType(file);
+				
+				if(contentType == ContentType.AHTML)
+					response = AHTMLProcessor.processResponse(file, request);
+				else
+				{
+					response = new Response(
+						HttpStatusCode.OK,
+						contentType,
+						getFileContents(file.toPath())
+						);
+				}
 			}
 			catch(IOException e)
 			{
@@ -61,7 +79,7 @@ public class ResponseFetcher
 	
 	private static Response getErrorResponse(HttpStatusCode statusCode)
 	{
-		Response templateResponse = fetch(statusCode.getCode() + ".shtml");
+		Response templateResponse = fetch(statusCode.getCode() + ".shtml", null);
 		if(templateResponse == null)
 			return new Response(statusCode, ContentType.PlainText, String.format("Error %d: %s", statusCode.getCode(), statusCode.getDescription()).getBytes());
 		else
@@ -83,6 +101,8 @@ public class ResponseFetcher
 		case "shtml":
 		case "php":
 			return ContentType.HTML;
+		case "ahtml":
+			return ContentType.AHTML;
 		case "css":
 			return ContentType.CSS;
 		case "json":
