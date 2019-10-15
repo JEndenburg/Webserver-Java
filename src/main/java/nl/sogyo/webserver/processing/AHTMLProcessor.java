@@ -151,9 +151,39 @@ public class AHTMLProcessor
 	{
 		Object value = null;
 		
-		if(parameterStrings[parameterIndex].startsWith("\""))
+		if(parameterStrings[parameterIndex].startsWith("\"") && parameterStrings[parameterIndex].endsWith("\""))
 			value = parameterStrings[parameterIndex].substring(1, parameterStrings[parameterIndex].length() - 1).replace("\\\"", "\"");
+		else if(isIntegerNumber(parameterStrings[parameterIndex]))
+			value = Integer.parseInt(parameterStrings[parameterIndex]);
+		else if(isDoubleNumber(parameterStrings[parameterIndex]))
+			value = Double.parseDouble(parameterStrings[parameterIndex]);
 		
 		return new Object[] { value, parameterIndex + 1 };
+	}
+	
+	private boolean isIntegerNumber(String string)
+	{
+		try
+		{
+			Integer.parseInt(string);
+			return true;
+		}
+		catch(NumberFormatException e)
+		{
+			return false;
+		}
+	}
+	
+	private boolean isDoubleNumber(String string)
+	{
+		try
+		{
+			Double.parseDouble(string);
+			return true;
+		}
+		catch(NumberFormatException e)
+		{
+			return false;
+		}
 	}
 }

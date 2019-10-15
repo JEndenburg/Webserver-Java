@@ -15,6 +15,11 @@
                     So yeah, welcome to my site. My name is DJ Fluffypuffkins.
                     <%
                         PRINT "<div class=\"result\">"
+                        PRINT "You have: "
+                        PRINT 15
+                        PRINT " eggs, which cost €"
+                        PRINT 2.50
+                        PRINT ". Also, par0 is "
                         PRINT $URL_PAR 0
                         PRINT "</div>"
                     %>
