@@ -6,6 +6,8 @@ import java.net.Socket;
 
 import nl.sogyo.webserver.input.Request;
 import nl.sogyo.webserver.input.RequestReader;
+import nl.sogyo.webserver.output.Response;
+import nl.sogyo.webserver.output.ResponseSender;
 
 public class ConnectionHandler implements Runnable {
     private Socket socket;
@@ -20,14 +22,9 @@ public class ConnectionHandler implements Runnable {
         try {
         	
         	Request request = RequestReader.parseRequestFromStream(socket.getInputStream());
-            
             System.out.println("Parsed Request: " + request);
-            
-            // Set up a writer that can write text to our binary output stream.
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            // Write a simple hello world textual response to the client.
-            writer.write("Thank you for connecting!\r\n");
-            writer.flush();
+            Response response = new Response(HttpStatusCode.OK, ContentType.HTML, "<HTML><body><p>Hello World!</p></body></HTML>");
+            ResponseSender.sendResponse(response, socket.getOutputStream());
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -79,7 +79,7 @@ public class Request
     	private HttpMethod httpMethod;
     	private String url;
     	private Map<String, String> headerParameters = new HashMap<String, String>();
-    	private String rawBody;
+    	private String rawBody = "";
     	
     	public void setHttpMethod(String httpMethod)
     	{
