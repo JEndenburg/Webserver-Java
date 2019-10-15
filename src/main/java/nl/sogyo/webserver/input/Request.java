@@ -1,8 +1,10 @@
-package nl.sogyo.webserver;
+package nl.sogyo.webserver.input;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import nl.sogyo.webserver.HttpMethod;
 
 /// Representation of the incoming HTTP request.
 public class Request 

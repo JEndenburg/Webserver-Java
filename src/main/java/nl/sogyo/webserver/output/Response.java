@@ -1,7 +1,9 @@
-package nl.sogyo.webserver;
+package nl.sogyo.webserver.output;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
+
+import nl.sogyo.webserver.HttpStatusCode;
 
 /// Representation of the server HTTP response
 public interface Response {
