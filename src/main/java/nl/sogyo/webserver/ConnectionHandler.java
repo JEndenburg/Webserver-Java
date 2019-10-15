@@ -9,7 +9,9 @@ import nl.sogyo.webserver.input.RequestReader;
 import nl.sogyo.webserver.output.Response;
 import nl.sogyo.webserver.output.ResponseSender;
 
-public class ConnectionHandler implements Runnable {
+public class ConnectionHandler implements Runnable 
+{
+	public static ServerProperties serverProperties = ServerProperties.loadProperties(ServerProperties.class.getClassLoader().getResource("server.properties").getFile().replace("%20", " "));
     private Socket socket;
 
     public ConnectionHandler(Socket toHandle) {
@@ -23,7 +25,7 @@ public class ConnectionHandler implements Runnable {
         	
         	Request request = RequestReader.parseRequestFromStream(socket.getInputStream());
             System.out.println("Parsed Request: " + request);
-            Response response = new Response(HttpStatusCode.OK, ContentType.HTML, "<HTML><body><p>Hello World!</p></body></HTML>");
+            Response response = new Response(HttpStatusCode.OK, ContentType.HTML, "<HTML><body><p>Hello World You requested " + request.getResourcePath() + "!</p></body></HTML>");
             ResponseSender.sendResponse(response, socket.getOutputStream());
 
         } catch (IOException e) {
@@ -45,8 +47,8 @@ public class ConnectionHandler implements Runnable {
         try {
             // A server socket opens a port on the local computer (in this program port 9090).
             // The computer now listens to connections that are made using the TCP/IP protocol.
-            ServerSocket socket = new ServerSocket(9090);
-            System.out.println("Application started. Listening at localhost:9090");
+            ServerSocket socket = new ServerSocket(serverProperties.port);
+            System.out.println("Application started. Listening at localhost:" + serverProperties.port);
 
             // Start an infinite loop. This pattern is common for applications that run indefinitely
             // and react on system events (e.g. connection established). Inside the loop, we handle

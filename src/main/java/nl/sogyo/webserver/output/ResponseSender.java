@@ -32,6 +32,7 @@ public class ResponseSender
 		writer.write(getHeaderString("date", response.getDate().format(DateTimeFormatter.RFC_1123_DATE_TIME)));
 		writer.write(getHeaderString("content-length", response.getContent().length()));
 		writer.write(getHeaderString("content-type", response.getContentType()));
+		writer.write(getHeaderString("connection", "close"));
 		
 		Map<String, String> customHeaders = response.getCustomHeaders();
 		for(String headerKey : customHeaders.keySet())
