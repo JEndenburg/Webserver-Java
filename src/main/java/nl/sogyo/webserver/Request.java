@@ -11,13 +11,15 @@ public class Request
 	private final String resourcePath;
 	private final Map<String, String> headerParameters;
 	private final Map<String, String> urlParameters;
+	private final String rawBody;
 	
-	private Request(HttpMethod method, String resourcePath, Map<String, String> headerParameters, Map<String, String> urlParameters)
+	private Request(HttpMethod method, String resourcePath, Map<String, String> headerParameters, Map<String, String> urlParameters, String rawBody)
 	{
 		this.method = method;
 		this.resourcePath = resourcePath;
 		this.headerParameters = headerParameters;
 		this.urlParameters = urlParameters;
+		this.rawBody = rawBody;
 	}
 	
     /// Defines the HTTP method that was used by the
@@ -67,7 +69,7 @@ public class Request
     @Override
     public String toString()
     {
-    	return String.format("%s %s\nURL Params: %s\nHeader Params: %s", method.toString(), resourcePath.toString(), urlParameters.toString(), headerParameters.toString());
+    	return String.format("%s %s\nURL Params: %s\nHeader Params: %s\nContent:\n%s", method.toString(), resourcePath.toString(), urlParameters.toString(), headerParameters.toString(), rawBody.toString());
     }
     
     public static class Builder
@@ -75,6 +77,7 @@ public class Request
     	private HttpMethod httpMethod;
     	private String url;
     	private Map<String, String> headerParameters = new HashMap<String, String>();
+    	private String rawBody;
     	
     	public void setHttpMethod(String httpMethod)
     	{
@@ -86,11 +89,14 @@ public class Request
     		this.url = url;
     	}
     	
-    	public void addHeader(String header)
+    	public void addHeader(String key, String value)
     	{
-    		String[] headerKVSplit = header.split(":");
-    		if(headerKVSplit.length == 2)
-    			headerParameters.put(headerKVSplit[0].strip(), headerKVSplit[1].strip());
+    		headerParameters.put(key, value);
+    	}
+    	
+    	public void setBody(String body)
+    	{
+    		this.rawBody = body;
     	}
     	
     	private Map<String, String> getUrlParameterMap(String parameterString)
@@ -114,7 +120,7 @@ public class Request
     	{
     		String[] resourcePathAndParameters = url.split("\\?");
     		Map<String, String> urlParameters = resourcePathAndParameters.length > 1 ? getUrlParameterMap(resourcePathAndParameters[1]) : new HashMap<String, String>();
-    		return new Request(httpMethod, resourcePathAndParameters[0], headerParameters, urlParameters);
+    		return new Request(httpMethod, resourcePathAndParameters[0], headerParameters, urlParameters, rawBody);
     	}
     }
 }

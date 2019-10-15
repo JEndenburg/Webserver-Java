@@ -6,6 +6,7 @@ import java.net.Socket;
 
 public class ConnectionHandler implements Runnable {
     private Socket socket;
+    private static final String CONTENT_LENGTH_HEADER_KEY = "content-length";
 
     public ConnectionHandler(Socket toHandle) {
         this.socket = toHandle;
@@ -46,7 +47,10 @@ public class ConnectionHandler implements Runnable {
     private Request parseRequest(BufferedReader reader) throws IOException
     {
     	String line = null;
+    	String[] header = null;
+    	int contentLength = -1;
     	ParsingPhase currentPhase = ParsingPhase.MethodCall;
+    	
     	Request.Builder requestBuilder = new Request.Builder();
     	do
     	{
@@ -62,12 +66,46 @@ public class ConnectionHandler implements Runnable {
     			currentPhase = ParsingPhase.Headers;
     			break;
     		case Headers:
-    			requestBuilder.addHeader(line);
+    			header = getHeaderKV(line);
+    			if(header != null)
+    			{
+    				requestBuilder.addHeader(header[0], header[1]);
+    				if(header[0].equalsIgnoreCase(CONTENT_LENGTH_HEADER_KEY))
+    					contentLength = Integer.parseInt(header[1]);
+    			}
     			break;
     		}
     	} while (!line.isEmpty());
     	
+    	if(contentLength > 0)
+    	{
+    		String content = "";
+	    	for(int i = 0; i < contentLength; i++)
+	    	{
+	    		int readChar = reader.read();
+	    		if(readChar == -1)
+	    			break;
+	    		else
+	    			content += (char)readChar;
+	    	}
+	    	
+	    	requestBuilder.setBody(content);
+    	}
+    	
     	return requestBuilder.build();
+    }
+    
+    private String[] getHeaderKV(String line)
+    {
+    	String[] kv = line.split(":");
+    	if(kv.length == 2)
+    	{
+    		kv[0] = kv[0].strip();
+    		kv[1] = kv[1].strip();
+    		return kv;
+    	}
+    	else
+    		return null;
     }
     
     private static enum ParsingPhase
