@@ -14,14 +14,10 @@
                     <img src="img/cat.jpg">
                     So yeah, welcome to my site. My name is DJ Fluffypuffkins.
                     <%
-                        PRINT "<div class=\"result\">"
-                        DEFINE INT $myval
-                        SET $myval 15
-                        PRINT $myval
-                        PRINT $myval
-                        SET $myval "Hello World"
-                        PRINT $myval
-                        PRINT $myval
+                        PRINT "<div>"
+
+                        ISEQUAL $URL_PARS @0 @1 "hello"
+                        PRINT "Hi!"
 
                         PRINT "</div>"
                     %>

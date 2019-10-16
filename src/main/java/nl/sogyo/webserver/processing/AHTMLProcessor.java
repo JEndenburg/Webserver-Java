@@ -263,11 +263,9 @@ public class AHTMLProcessor
 				{
 					Object[] subValue = getVariableValue(script, value, parameterStrings, currentIndex + 1);
 					value = subValue[0];
-					indexShift += (int)subValue[1];
 				}
 			}
 		}
-		
 		return new Object[] { value, indexShift };
 	}
 	

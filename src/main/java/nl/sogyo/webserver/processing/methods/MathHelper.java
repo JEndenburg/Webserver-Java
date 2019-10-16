@@ -2,6 +2,81 @@ package nl.sogyo.webserver.processing.methods;
 
 public class MathHelper
 {
+
+	public static boolean objectsLessThan(Object leftSide, Object rightSide)
+	{
+		if(leftSide instanceof Integer)
+		{
+			if(rightSide instanceof Integer)
+				return ((int)leftSide) < ((int)rightSide);
+			else if(rightSide instanceof Double)
+				return ((int)leftSide) < ((double)rightSide);
+		}
+		else if(leftSide instanceof Double)
+		{
+			if(rightSide instanceof Integer)
+				return ((double)leftSide) < ((int)rightSide);
+			else if(rightSide instanceof Double)
+				return ((double)leftSide) < ((double)rightSide);
+		}
+		else if(leftSide instanceof String)
+		{
+			if(rightSide instanceof Integer)
+				return ((String)leftSide).length() < ((int)rightSide);
+			else if(rightSide instanceof Double)
+				return ((String)leftSide).length() < ((double)rightSide);
+		}
+		
+		return false;
+	}
+
+	public static boolean objectsGreaterThan(Object leftSide, Object rightSide)
+	{
+		if(leftSide instanceof Integer)
+		{
+			if(rightSide instanceof Integer)
+				return ((int)leftSide) > ((int)rightSide);
+			else if(rightSide instanceof Double)
+				return ((int)leftSide) > ((double)rightSide);
+		}
+		else if(leftSide instanceof Double)
+		{
+			if(rightSide instanceof Integer)
+				return ((double)leftSide) > ((int)rightSide);
+			else if(rightSide instanceof Double)
+				return ((double)leftSide) > ((double)rightSide);
+		}
+		else if(leftSide instanceof String)
+		{
+			if(rightSide instanceof Integer)
+				return ((String)leftSide).length() > ((int)rightSide);
+			else if(rightSide instanceof Double)
+				return ((String)leftSide).length() > ((double)rightSide);
+		}
+		
+		return false;
+	}
+	
+	public static boolean objectsEqual(Object leftSide, Object rightSide)
+	{
+		if(leftSide instanceof Integer)
+		{
+			if(rightSide instanceof Integer)
+				return ((int)leftSide) == ((int)rightSide);
+			else if(rightSide instanceof Double)
+				return ((int)leftSide) == ((double)rightSide);
+		}
+		else if(leftSide instanceof Double)
+		{
+			if(rightSide instanceof Integer)
+				return ((double)leftSide) == ((int)rightSide);
+			else if(rightSide instanceof Double)
+				return ((double)leftSide) == ((double)rightSide);
+		}
+		
+		return leftSide.equals(rightSide);
+	}
+	
 	public static Object divideObjects(Object leftSide, Object rightSide)
 	{
 		Object returnValue = leftSide;

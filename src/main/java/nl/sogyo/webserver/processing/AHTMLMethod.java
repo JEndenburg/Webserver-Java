@@ -50,6 +50,26 @@ public enum AHTMLMethod
 		return null;
 	}, ParameterRequestType.VariableNameAndValues),
 	
+	ISEQUAL("ISEQUAL", (script, pars) -> {
+		script.skipNextLine = !MathHelper.objectsEqual(pars[0], pars[1]);
+		return null;
+	}),
+	
+	ISNOTEQUAL("IsNOTEQUAL", (script, pars) -> {
+		script.skipNextLine = MathHelper.objectsEqual(pars[0], pars[1]);
+		return null;
+	}),
+	
+	ISABOVE("ISABOVE", (script, pars) -> {
+		script.skipNextLine = !MathHelper.objectsGreaterThan(pars[0], pars[1]);
+		return null;
+	}),
+	
+	ISBELOW("ISBELOW", (script, pars) -> {
+		script.skipNextLine = !MathHelper.objectsLessThan(pars[0], pars[1]);
+		return null;
+	}),
+	
 	;
 	
 	private final String methodName;

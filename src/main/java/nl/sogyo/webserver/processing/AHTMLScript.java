@@ -9,7 +9,8 @@ import java.util.Map;
 public class AHTMLScript
 {
 	private Map<String, Object> variableMap = new HashMap<>();
-	private List<MethodCall> script = new ArrayList<MethodCall>(); 
+	private List<MethodCall> script = new ArrayList<MethodCall>();
+	public boolean skipNextLine = false;
 	
 	public void addVariable(String variableName, Object value)
 	{
@@ -30,7 +31,23 @@ public class AHTMLScript
 	public String executeMethod(MethodCall methodCall)
 	{
 		script.add(methodCall);
-		return methodCall.execute(this);
+		if(skipNextLine)
+		{
+			skipNextLine = false;
+			return null;
+		}
+		else
+		{
+			try
+			{
+				return methodCall.execute(this);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				return null;
+			}
+		}
 	}
 	
 	public static class MethodCall
@@ -61,6 +78,7 @@ public class AHTMLScript
 				else
 					parameterValues.add(parameters[i]);
 			}
+						
 			return method.execute(script, parameterValues.toArray());
 		}
 	}
