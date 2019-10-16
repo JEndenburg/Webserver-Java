@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.sogyo.webserver.HttpMethod;
+import nl.sogyo.webserver.content.WebFormDeserializer;
 
 /// Representation of the incoming HTTP request.
 public class Request 
@@ -68,6 +69,24 @@ public class Request
     	return urlParameters.get(name);
     }
     
+    public String getRawBody()
+    {
+    	return rawBody;
+    }
+    
+    public Map<String, Object> getBody()
+    {
+    	String contentType = getHeaderParameterValue("content-type");
+    	if(contentType == null)
+    		return null;
+    	switch(contentType)
+    	{
+    	case "application/x-www-form-urlencoded":
+    		return WebFormDeserializer.deserialize(rawBody);
+    	}
+    	return null;
+    }
+    
     @Override
     public String toString()
     {
@@ -93,7 +112,7 @@ public class Request
     	
     	public void addHeader(String key, String value)
     	{
-    		headerParameters.put(key, value);
+    		headerParameters.put(key.toLowerCase(), value.toLowerCase());
     	}
     	
     	public void setBody(String body)

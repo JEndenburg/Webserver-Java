@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +30,16 @@ public class AHTMLProcessor
 		for(String parName : request.getParameterNames())
 			urlParameters.add(new String[] { parName, request.getParameterValue(parName) });
 		script.addVariable("URL_PARS", urlParameters.toArray(Object[]::new));
+		script.addVariable("METHOD", request.getHTTPMethod().toString());
+		
+		Map<String, Object> bodyMap = request.getBody();
+		
+		if(bodyMap != null)
+		{
+			List<String[]> body = new ArrayList<>();
+			for(String bodyKey : bodyMap.keySet())
+				script.addVariable("BODY:" + bodyKey.strip().replace(' ', '_'), bodyMap.get(bodyKey));
+		}
 	}
 	
 	public static Response processResponse(File file, Request request)

@@ -75,11 +75,21 @@ public class AHTMLScript
 			{
 				MethodCall methodCall = script.get(position);
 				if(methodCall.method == AHTMLMethod.BREAK)
+				{
+					rerun = false;
 					return sb.toString();
+				}
 				
-				String output = script.get(position).execute(this);
-				if(output != null)
-					sb.append(output);
+				try
+				{
+					String output = script.get(position).execute(this);
+					if(output != null)
+						sb.append(output);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 			else
 				skipNextLine = false;
