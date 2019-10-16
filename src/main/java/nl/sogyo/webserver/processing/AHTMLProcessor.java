@@ -26,7 +26,7 @@ public class AHTMLProcessor
 		List<String[]> urlParameters = new ArrayList<>();
 		for(String parName : request.getParameterNames())
 			urlParameters.add(new String[] { parName, request.getParameterValue(parName) });
-		page.addVariable("URL_PARS", urlParameters.toArray(String[]::new));
+		page.addVariable("URL_PARS", urlParameters.toArray(Object[]::new));
 	}
 	
 	public static Response processResponse(File file, Request request)
@@ -111,7 +111,6 @@ public class AHTMLProcessor
 	{
 		if(line.isBlank())
 			return null;
-		System.out.println("Processing \"" + line + "\"");
 		int nextSpaceIndex = line.indexOf(' ');
 		
 		String methodName = line;
@@ -124,9 +123,6 @@ public class AHTMLProcessor
 		AHTMLMethod method = AHTMLMethod.fromName(methodName);
 		
 		Object[] parameters = getParameters(parameterString);
-		
-		for(Object o : parameters)
-			System.out.println("Arg: " + o);
 		
 		return method.execute(page, parameters);
 	}
@@ -150,6 +146,10 @@ public class AHTMLProcessor
 	private Object[] getParameterValue(String[] parameterStrings, int parameterIndex)
 	{
 		Object value = null;
+		int indexShift = 1;
+		
+		if(parameterIndex >= parameterStrings.length)
+			return new Object[] { null, parameterIndex + indexShift };
 		
 		if(parameterStrings[parameterIndex].startsWith("\"") && parameterStrings[parameterIndex].endsWith("\""))
 			value = parameterStrings[parameterIndex].substring(1, parameterStrings[parameterIndex].length() - 1).replace("\\\"", "\"");
@@ -157,8 +157,14 @@ public class AHTMLProcessor
 			value = Integer.parseInt(parameterStrings[parameterIndex]);
 		else if(isDoubleNumber(parameterStrings[parameterIndex]))
 			value = Double.parseDouble(parameterStrings[parameterIndex]);
+		else if(parameterStrings[parameterIndex].startsWith("$"))
+		{
+			Object[] result = getVariableValue(parameterStrings[parameterIndex].substring(1), parameterStrings, parameterIndex);
+			value = result[0];
+			indexShift += (int)result[1];
+		}
 		
-		return new Object[] { value, parameterIndex + 1 };
+		return new Object[] { value, parameterIndex + indexShift };
 	}
 	
 	private boolean isIntegerNumber(String string)
@@ -185,5 +191,41 @@ public class AHTMLProcessor
 		{
 			return false;
 		}
+	}
+	
+	private Object[] getVariableValue(Object value, String[] parameterStrings, int currentIndex)
+	{
+		int indexShift = 0;
+		
+		if(value.getClass().isArray())
+		{
+			int nextIndex = currentIndex + 1;
+			if(nextIndex < parameterStrings.length && parameterStrings[nextIndex].startsWith("@"))
+			{
+				parameterStrings[nextIndex] = parameterStrings[nextIndex].substring(1);
+				Object[] nextValue = getParameterValue(parameterStrings, nextIndex);
+				int selectedIndex = (int)nextValue[0];
+				Object[] arrVal = (Object[])value;
+				if(selectedIndex < arrVal.length)
+					value = ((Object[]) value)[selectedIndex];
+				else
+					value = null;
+				indexShift = (int)nextValue[1];
+				
+				if(value != null && !value.getClass().isPrimitive())
+				{
+					Object[] subValue = getVariableValue(value, parameterStrings, currentIndex + 1);
+					value = subValue[0];
+					indexShift += (int)subValue[1];
+				}
+			}
+		}
+		
+		return new Object[] { value, indexShift };
+	}
+	
+	private Object[] getVariableValue(String variableName, String[] parameterStrings, int currentIndex)
+	{
+		return getVariableValue(page.getVariable(variableName), parameterStrings, currentIndex);
 	}
 }
