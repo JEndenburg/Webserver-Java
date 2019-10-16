@@ -15,20 +15,27 @@
                     So yeah, welcome to my site. My name is DJ Fluffypuffkins.
                     <%
                         PRINT "<div class=\"result\">"
-                        DEFINE STR $name
-                        SET $name "Sjaak"
-                        DEFINE INT $age
-                        SET $age 22
-                        DEFINE FLT $height
-                        SET $height 182.24
+                        DEFINE STR $myval
 
-                        PRINT "A person named "
-                        PRINT $name
-                        PRINT " age "
-                        PRINT $age
-                        PRINT " who is "
-                        PRINT $height
-                        PRINT "cm tall."
+                        PRINT "<br/>"
+                        SET $myval "Hello "
+                        PRINT $myval
+
+                        PRINT "<br/>"
+                        ADD $myval "World!"
+                        PRINT $myval
+
+                        PRINT "<br/>"
+                        SUB $myval "o"
+                        PRINT $myval
+
+                        PRINT "<br/>"
+                        MUL $myval 2
+                        PRINT $myval
+
+                        PRINT "<br/>"
+                        DIV $myval 9
+                        PRINT $myval
 
                         PRINT "</div>"
                     %>

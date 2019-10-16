@@ -18,8 +18,35 @@ public enum AHTMLMethod
 		}, ParameterRequestType.TypeAndVariableName),
 	
 	SET("SET", (page, pars) -> {
-		System.out.println(pars[0] + " = " + pars[1]);
 		page.addVariable(pars[0].toString(), pars[1]);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+	
+	ADD("ADD", (page, pars) -> {
+		Object val = page.getVariable(pars[0].toString());
+		val = MathHelper.addObjects(val, pars[1]);
+		page.addVariable(pars[0].toString(), val);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+	
+	SUB("SUB", (page, pars) -> {
+		Object val = page.getVariable(pars[0].toString());
+		val = MathHelper.subtractObjects(val, pars[1]);
+		page.addVariable(pars[0].toString(), val);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+
+	MUL("MUL", (page, pars) -> {
+		Object val = page.getVariable(pars[0].toString());
+		val = MathHelper.multiplyObjects(val, pars[1]);
+		page.addVariable(pars[0].toString(), val);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+
+	DIV("DIV", (page, pars) -> {
+		Object val = page.getVariable(pars[0].toString());
+		val = MathHelper.divideObjects(val, pars[1]);
+		page.addVariable(pars[0].toString(), val);
 		return null;
 	}, ParameterRequestType.VariableNameAndValues),
 	
