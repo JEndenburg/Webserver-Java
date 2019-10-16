@@ -1,7 +1,5 @@
 package nl.sogyo.webserver.processing;
 
-import java.lang.reflect.InvocationTargetException;
-
 import nl.sogyo.webserver.processing.methods.*;
 
 public enum AHTMLMethod
@@ -12,7 +10,12 @@ public enum AHTMLMethod
 		AHTMLValueType type = AHTMLValueType.fromName(pars[0].toString());
 		Object defaultValue = type.getDefaultValue();
 		if(type.isArray())
-			defaultValue = new Object[Integer.parseInt((String)pars[2])];
+		{
+			if(pars.length > 2)
+				defaultValue = new Object[Integer.parseInt(pars[2].toString())];
+			else
+				defaultValue = new Object[0];
+		}
 		script.addVariable(pars[1].toString(), defaultValue);
 		return null;
 		}, ParameterRequestType.TypeAndVariableName),
@@ -80,7 +83,7 @@ public enum AHTMLMethod
 	}),
 	
 	DEBUG("DEBUG", (script, pars) -> {
-		System.out.println(java.util.Arrays.asList(pars));
+		System.out.println("[DEBUG] " + java.util.Arrays.asList(pars));
 		return null;
 	}),
 	
@@ -94,7 +97,66 @@ public enum AHTMLMethod
 		return null;
 	}),
 	
-	BREAK("BREAK", (script, pars) -> null);
+	BREAK("BREAK", (script, pars) -> null),
+	
+	ARRAY_ADD("ARRAY_ADD", (script, pars) -> {
+		Object[] srcArray = (Object[]) script.getVariable(pars[0].toString());
+		Object[] dstArray = new Object[srcArray.length + 1];
+		System.arraycopy(srcArray, 0, dstArray, 0, srcArray.length);
+		dstArray[dstArray.length - 1] = pars[1];
+		script.addVariable(pars[0].toString(), dstArray);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+	
+	ARRAY_REMOVEAT("ARRAY_REMOVEAT", (script, pars) -> {
+		Object[] srcArray = (Object[]) script.getVariable(pars[0].toString());
+		Object[] dstArray = new Object[srcArray.length - 1];
+		int removedId = Integer.parseInt(pars[1].toString());
+		
+		for(int i = 0, j = 0; i < srcArray.length; i++)
+		{
+			if(i != removedId)
+			{
+				dstArray[j] = srcArray[i];
+				j++;
+			}
+		}
+		
+		script.addVariable(pars[0].toString(), dstArray);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+	
+	ARRAY_INSERT("ARRAY_INSERT", (script, pars) -> {
+		Object[] srcArray = (Object[]) script.getVariable(pars[0].toString());
+		Object[] dstArray = new Object[srcArray.length + 1];
+		int insertId = Integer.parseInt(pars[1].toString());
+		
+		for(int i = 0, j = 0; i < srcArray.length; j++)
+		{
+			if(j == insertId)
+				dstArray[j] = pars[2];
+			else
+			{
+				dstArray[j] = srcArray[i];
+				i++;
+			}
+		}
+		
+		script.addVariable(pars[0].toString(), dstArray);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+	
+	GIVE_ARRAY_LENGTH("GIVE_ARRAY_LENGTH", (script, pars) -> {
+		Object[] array = (Object[])pars[1];
+		script.addVariable(pars[0].toString(), array.length);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+	
+	GIVE_ARRAY_VALUE("GIVE_ARRAY_VALUE", (script, pars) -> {
+		Object[] array = (Object[])pars[1];
+		script.addVariable(pars[0].toString(), array[(int)pars[2]]);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
 	
 	;
 	

@@ -246,38 +246,4 @@ public class AHTMLProcessor
 			return false;
 		}
 	}
-	
-	public static Object[] getVariableValue(AHTMLScript script, Object value, String[] parameterStrings, int currentIndex)
-	{
-		int indexShift = 0;
-		
-		if(value.getClass().isArray())
-		{
-			int nextIndex = currentIndex + 1;
-			if(nextIndex < parameterStrings.length && parameterStrings[nextIndex].startsWith("@"))
-			{
-				parameterStrings[nextIndex] = parameterStrings[nextIndex].substring(1);
-				Object[] nextValue = getParameterValue(script, parameterStrings, nextIndex);
-				int selectedIndex = (int)nextValue[0];
-				Object[] arrVal = (Object[])value;
-				if(selectedIndex < arrVal.length)
-					value = ((Object[]) value)[selectedIndex];
-				else
-					value = null;
-				indexShift = (int)nextValue[1];
-				
-				if(value != null && !value.getClass().isPrimitive())
-				{
-					Object[] subValue = getVariableValue(script, value, parameterStrings, currentIndex + 1);
-					value = subValue[0];
-				}
-			}
-		}
-		return new Object[] { value, indexShift };
-	}
-	
-	private static Object[] getVariableValue(AHTMLScript script, String variableName, String[] parameterStrings, int currentIndex)
-	{
-		return getVariableValue(script, script.getVariable(variableName), parameterStrings, currentIndex);
-	}
 }

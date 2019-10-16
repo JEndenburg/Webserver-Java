@@ -84,9 +84,9 @@ public class AHTMLScript
 			{
 				return methodCall.execute(this);
 			}
-			catch(Throwable e)
+			catch(Exception e)
 			{
-				//e.printStackTrace();
+				e.printStackTrace();
 				return null;
 			}
 		}
@@ -113,9 +113,7 @@ public class AHTMLScript
 			{
 				if(parameters[i] instanceof VariableReference)
 				{
-					Object[] valueAndShift = ((VariableReference)parameters[i]).getValue(script, parameterNames, i);
-					parameterValues.add(valueAndShift[0]);
-					i += (int)valueAndShift[1];
+					parameterValues.add(((VariableReference)parameters[i]).getValue(script, parameterNames, i));
 				}
 				else
 					parameterValues.add(parameters[i]);
@@ -134,13 +132,9 @@ public class AHTMLScript
 			this.variableName = variableName;
 		}
 		
-		public Object[] getValue(AHTMLScript script, String[] parameterStrings, int currentIndex)
+		public Object getValue(AHTMLScript script, String[] parameterStrings, int currentIndex)
 		{
-			Object rawValue = script.getVariable(variableName);
-			if(rawValue == null)
-				return new Object[] { null, 0 };
-			else
-				return AHTMLProcessor.getVariableValue(script, script.getVariable(variableName), parameterStrings, currentIndex);
+			return script.getVariable(variableName);
 		}
 	}
 }

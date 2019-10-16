@@ -11,33 +11,42 @@
             <article>
                 <div class="article-title">This is an article!</div>
                 <div class="article-content">
+
                     <img src="img/cat.jpg">
                     So yeah, welcome to my site. My name is DJ Fluffypuffkins.
+
                     <%
                         STARTINIT
 
-                        LABEL "Count"
-                        DEFINE INT $_count
-                        LABEL "Count:Iteration"
-                        PRINT "Current count: "
-                        PRINT $_count
-                        PRINT "<br/>"
-                        ADD $_count 1
-                        ISNOTEQUAL $_count 10
-                        GOTO "Count:Iteration"
-                        BREAK
-
-                        LABEL "Hello World"
-                        PRINT "Hello World! How are you?"
+                        LABEL "Print Array"
+                            DEFINE INT $_index
+                            DEFINE INT $_val
+                            GIVE_ARRAY_LENGTH $_index $array
+                            LABEL "Print Array:Iterate"
+                                SUB $_index 1
+                                GIVE_ARRAY_VALUE $_val $array $_index
+                                PRINT $_val
+                                ISNOTEQUAL $_index 0
+                                GOTO "Print Array:Iterate"
                         BREAK
 
                         ENDINIT
 
                         PRINT "<div>"
 
-                        GOTO "Hello World"
-                        GOTO "Count"
-                        GOTO "Hello World"
+                        DEFINE ARR $array
+                        ARRAY_ADD $array 5
+                        ARRAY_ADD $array 3
+                        ARRAY_ADD $array 7
+
+                        GOTO "Print Array"
+
+                        ARRAY_INSERT $array 1 10
+                        ARRAY_ADD $array 1
+                        ARRAY_REMOVEAT $array 0
+
+                        GOTO "Print Array"
+
 
                         PRINT "</div>"
                     %>
