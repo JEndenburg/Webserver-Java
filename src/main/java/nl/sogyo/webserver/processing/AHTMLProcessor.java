@@ -123,15 +123,41 @@ public class AHTMLProcessor
 		AHTMLMethod method = AHTMLMethod.fromName(methodName);
 		Object[] parameters;
 		
-		if(method == AHTMLMethod.DEFINE)
-			parameters = getDefineParameters(parameterString);
-		else
+		switch(method.getParameterRequestType())
+		{
+		default:
+		case Regular:
 			parameters = getParameters(parameterString);
+			break;
+		case TypeAndVariableName:
+			parameters = getTypeAndVariableNameParameters(parameterString);
+			break;
+		case VariableNameAndValues:
+			parameters = getVariableNameAndValuesParameters(parameterString);
+			break;
+		}
 		
 		return method.execute(page, parameters);
 	}
 	
-	private Object[] getDefineParameters(String parameterString)
+	private Object[] getVariableNameAndValuesParameters(String parameterString)
+	{
+		String[] splitParameterString = parameterString.split(parameterRegexPattern.pattern());
+		if(splitParameterString[0].startsWith("$"))
+		{
+			String passingParameterString = parameterString.substring(splitParameterString[0].length() + 1);
+			Object[] valuedParameters = getParameters(passingParameterString);
+			
+			Object[] returnValues = new Object[valuedParameters.length + 1];
+			System.arraycopy(valuedParameters, 0, returnValues, 1, valuedParameters.length);
+			returnValues[0] = splitParameterString[0].substring(1);
+			return returnValues;
+		}
+		else
+			return null;
+	}
+	
+	private Object[] getTypeAndVariableNameParameters(String parameterString)
 	{
 		String[] splitParameterString = parameterString.split(parameterRegexPattern.pattern());
 		if(splitParameterString[1].startsWith("$"))

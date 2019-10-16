@@ -15,17 +15,30 @@ public enum AHTMLMethod
 			defaultValue = new Object[Integer.parseInt((String)pars[2])];
 		page.addVariable(pars[1].toString(), defaultValue);
 		return null;
-		}),
+		}, ParameterRequestType.TypeAndVariableName),
+	
+	SET("SET", (page, pars) -> {
+		System.out.println(pars[0] + " = " + pars[1]);
+		page.addVariable(pars[0].toString(), pars[1]);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
 	
 	;
 	
 	private final String methodName;
 	private final IExecutable executable;
+	private final ParameterRequestType parameterRequestType;
 	
-	private AHTMLMethod(String methodName, IExecutable executable)
+	private AHTMLMethod(String methodName, IExecutable executable, ParameterRequestType parameterRequestType)
 	{
 		this.methodName = methodName;
 		this.executable = executable;
+		this.parameterRequestType = parameterRequestType;
+	}
+	
+	private AHTMLMethod(String methodName, IExecutable executable)
+	{
+		this(methodName, executable, ParameterRequestType.Regular);
 	}
 	
 	public static AHTMLMethod fromName(String name)
@@ -38,8 +51,18 @@ public enum AHTMLMethod
 		return null;
 	}
 	
+	public ParameterRequestType getParameterRequestType()
+	{
+		return parameterRequestType;
+	}
+	
 	public String execute(AHTMLPage page, Object[] parameters)
 	{
 		return executable.execute(page, parameters);
+	}
+	
+	public static enum ParameterRequestType
+	{
+		Regular, TypeAndVariableName, VariableNameAndValues,
 	}
 }

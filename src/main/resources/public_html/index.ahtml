@@ -16,8 +16,11 @@
                     <%
                         PRINT "<div class=\"result\">"
                         DEFINE STR $name
+                        SET $name "Sjaak"
                         DEFINE INT $age
+                        SET $age 22
                         DEFINE FLT $height
+                        SET $height 182.24
 
                         PRINT "A person named "
                         PRINT $name
