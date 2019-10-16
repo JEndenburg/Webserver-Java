@@ -16,39 +16,17 @@
                     So yeah, welcome to my site. My name is DJ Fluffypuffkins.
 
                     <%
-                        STARTINIT
 
-                        LABEL "Print Array"
-                            DEFINE INT $_index
-                            DEFINE INT $_val
-                            GIVE_ARRAY_LENGTH $_index $array
-                            LABEL "Print Array:Iterate"
-                                SUB $_index 1
-                                GIVE_ARRAY_VALUE $_val $array $_index
-                                PRINT $_val
-                                ISNOTEQUAL $_index 0
-                                GOTO "Print Array:Iterate"
-                        BREAK
+                        DEFINE INT $myVal
+                        GIVE_STATIC $myVal "Thing"
 
-                        ENDINIT
+                        ISNULL $myVal
+                            SET $myVal 0
 
-                        PRINT "<div>"
+                        PRINT $myVal
 
-                        DEFINE ARR $array
-                        ARRAY_ADD $array 5
-                        ARRAY_ADD $array 3
-                        ARRAY_ADD $array 7
-
-                        GOTO "Print Array"
-
-                        ARRAY_INSERT $array 1 10
-                        ARRAY_ADD $array 1
-                        ARRAY_REMOVEAT $array 0
-
-                        GOTO "Print Array"
-
-
-                        PRINT "</div>"
+                        ADD $myVal 1
+                        TAKE_STATIC $myVal "Thing"
                     %>
                 </div>
             </article>

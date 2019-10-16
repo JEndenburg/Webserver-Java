@@ -8,12 +8,30 @@ import java.util.Map;
 
 public class AHTMLScript
 {
+	private static Map<String, Object> staticVariableMap = new HashMap<>();
+	
 	private Map<String, Object> variableMap = new HashMap<>();
 	private List<MethodCall> script = new ArrayList<>();
 	private Map<String, Integer> labels = new HashMap<>();
 	private boolean rerun = false;
 	public boolean skipNextLine = false;
 	public boolean init = false;
+	
+	public void addStaticVariable(String variableName, Object value)
+	{
+		if(staticVariableMap.containsKey(variableName))
+			staticVariableMap.replace(variableName, value);
+		else
+			staticVariableMap.put(variableName, value);
+	}
+	
+	public Object getStaticVariable(String variableName)
+	{
+		if(staticVariableMap.containsKey(variableName))
+			return staticVariableMap.get(variableName);
+		else
+			return null;
+	}
 	
 	public void addVariable(String variableName, Object value)
 	{

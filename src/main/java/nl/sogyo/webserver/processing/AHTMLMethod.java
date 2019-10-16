@@ -53,6 +53,11 @@ public enum AHTMLMethod
 		return null;
 	}, ParameterRequestType.VariableNameAndValues),
 	
+	ISNULL("ISNULL", (script, pars) -> {
+		script.skipNextLine = pars[0] != null;
+		return null;
+	}),
+	
 	ISEQUAL("ISEQUAL", (script, pars) -> {
 		script.skipNextLine = !MathHelper.objectsEqual(pars[0], pars[1]);
 		return null;
@@ -155,6 +160,18 @@ public enum AHTMLMethod
 	GIVE_ARRAY_VALUE("GIVE_ARRAY_VALUE", (script, pars) -> {
 		Object[] array = (Object[])pars[1];
 		script.addVariable(pars[0].toString(), array[(int)pars[2]]);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+	
+	GIVE_STATIC("GIVE_STATIC", (script, pars) -> {
+		Object staticValue = script.getStaticVariable(pars[1].toString());
+		script.addVariable(pars[0].toString(), staticValue);
+		return null;
+	}, ParameterRequestType.VariableNameAndValues),
+	
+	TAKE_STATIC("TAKE_STATIC", (script, pars) -> {
+		Object localValue = script.getVariable(pars[0].toString());
+		script.addStaticVariable(pars[1].toString(), localValue);
 		return null;
 	}, ParameterRequestType.VariableNameAndValues),
 	
