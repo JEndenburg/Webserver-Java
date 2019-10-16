@@ -60,9 +60,9 @@ public class AHTMLProcessor
 	private String getProcessedContent(File file) throws IOException
 	{
 		StringBuilder contentBuilder = new StringBuilder();
+		String outputLine = "";
 		for(String line : Files.readAllLines(file.toPath()))
 		{
-			String outputLine = "";
 			String currentLine = line;
 			int codeStartIndex = -1;
 			int codeEndIndex = -1;
@@ -102,8 +102,12 @@ public class AHTMLProcessor
 				}
 			}
 			
-			if(!outputLine.isBlank())
-				contentBuilder.append(outputLine + "\n");
+			if(!inCodeLine)
+			{
+				if(!outputLine.isBlank())
+					contentBuilder.append(outputLine + "\n");
+				outputLine = "";
+			}
 		}
 		
 		return contentBuilder.toString();
