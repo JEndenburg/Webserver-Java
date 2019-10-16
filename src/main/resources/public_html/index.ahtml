@@ -14,10 +14,30 @@
                     <img src="img/cat.jpg">
                     So yeah, welcome to my site. My name is DJ Fluffypuffkins.
                     <%
+                        STARTINIT
+
+                        LABEL "Count"
+                        DEFINE INT $_count
+                        LABEL "Count:Iteration"
+                        PRINT "Current count: "
+                        PRINT $_count
+                        PRINT "<br/>"
+                        ADD $_count 1
+                        ISNOTEQUAL $_count 10
+                        GOTO "Count:Iteration"
+                        BREAK
+
+                        LABEL "Hello World"
+                        PRINT "Hello World! How are you?"
+                        BREAK
+
+                        ENDINIT
+
                         PRINT "<div>"
 
-                        ISEQUAL $URL_PARS @0 @1 "hello"
-                        PRINT "Hi!"
+                        GOTO "Hello World"
+                        GOTO "Count"
+                        GOTO "Hello World"
 
                         PRINT "</div>"
                     %>

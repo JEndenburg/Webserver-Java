@@ -9,8 +9,11 @@ import java.util.Map;
 public class AHTMLScript
 {
 	private Map<String, Object> variableMap = new HashMap<>();
-	private List<MethodCall> script = new ArrayList<MethodCall>();
+	private List<MethodCall> script = new ArrayList<>();
+	private Map<String, Integer> labels = new HashMap<>();
+	private boolean rerun = false;
 	public boolean skipNextLine = false;
+	public boolean init = false;
 	
 	public void addVariable(String variableName, Object value)
 	{
@@ -28,10 +31,49 @@ public class AHTMLScript
 			return null;
 	}
 	
+	public int getPosition()
+	{
+		return script.size() - 1;
+	}
+	
+	public void addLabel(String labelName)
+	{
+		if(!rerun)
+			labels.put(labelName, getPosition());
+	}
+	
+	public int getLabelPosition(String labelName)
+	{
+		return labels.get(labelName);
+	}
+	
+	public String executeFromPosition(int position)
+	{
+		rerun = true;
+		StringBuilder sb = new StringBuilder();
+		for(; position < script.size(); position++)
+		{
+			if(!skipNextLine)
+			{
+				MethodCall methodCall = script.get(position);
+				if(methodCall.method == AHTMLMethod.BREAK)
+					return sb.toString();
+				
+				String output = script.get(position).execute(this);
+				if(output != null)
+					sb.append(output);
+			}
+			else
+				skipNextLine = false;
+		}
+		rerun = false;
+		return sb.toString();
+	}
+	
 	public String executeMethod(MethodCall methodCall)
 	{
 		script.add(methodCall);
-		if(skipNextLine)
+		if(skipNextLine || (init && (methodCall.method != AHTMLMethod.ENDINIT && methodCall.method != AHTMLMethod.LABEL)))
 		{
 			skipNextLine = false;
 			return null;
@@ -42,9 +84,9 @@ public class AHTMLScript
 			{
 				return methodCall.execute(this);
 			}
-			catch(Exception e)
+			catch(Throwable e)
 			{
-				e.printStackTrace();
+				//e.printStackTrace();
 				return null;
 			}
 		}
@@ -94,7 +136,11 @@ public class AHTMLScript
 		
 		public Object[] getValue(AHTMLScript script, String[] parameterStrings, int currentIndex)
 		{
-			return AHTMLProcessor.getVariableValue(script, script.getVariable(variableName), parameterStrings, currentIndex);
+			Object rawValue = script.getVariable(variableName);
+			if(rawValue == null)
+				return new Object[] { null, 0 };
+			else
+				return AHTMLProcessor.getVariableValue(script, script.getVariable(variableName), parameterStrings, currentIndex);
 		}
 	}
 }

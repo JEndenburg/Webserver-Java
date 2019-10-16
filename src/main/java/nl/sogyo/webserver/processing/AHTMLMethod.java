@@ -55,7 +55,7 @@ public enum AHTMLMethod
 		return null;
 	}),
 	
-	ISNOTEQUAL("IsNOTEQUAL", (script, pars) -> {
+	ISNOTEQUAL("ISNOTEQUAL", (script, pars) -> {
 		script.skipNextLine = MathHelper.objectsEqual(pars[0], pars[1]);
 		return null;
 	}),
@@ -69,6 +69,32 @@ public enum AHTMLMethod
 		script.skipNextLine = !MathHelper.objectsLessThan(pars[0], pars[1]);
 		return null;
 	}),
+	
+	LABEL("LABEL", (script, pars) -> {
+		script.addLabel(pars[0].toString());
+		return null;
+	}),
+	
+	GOTO("GOTO", (script, pars) -> {
+		return script.executeFromPosition(script.getLabelPosition(pars[0].toString()));
+	}),
+	
+	DEBUG("DEBUG", (script, pars) -> {
+		System.out.println(java.util.Arrays.asList(pars));
+		return null;
+	}),
+	
+	STARTINIT("STARTINIT", (script, pars) -> {
+		script.init = true;
+		return null;
+	}),
+	
+	ENDINIT("ENDINIT", (script, pars) -> {
+		script.init = false;
+		return null;
+	}),
+	
+	BREAK("BREAK", (script, pars) -> null);
 	
 	;
 	

@@ -127,6 +127,13 @@ public class AHTMLProcessor
 			parameterString = line.substring(nextSpaceIndex + 1);
 		}
 		AHTMLMethod method = AHTMLMethod.fromName(methodName);
+		
+		if(method == null)
+		{
+			System.out.println("Unknown method \"" + methodName + "\" was called.");
+			return null;
+		}
+		
 		Object[] parameters;
 		
 		String[] splitParameterString = parameterString.split(parameterRegexPattern.pattern());
