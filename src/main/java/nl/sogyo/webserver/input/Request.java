@@ -111,7 +111,6 @@ public class Request
     		for(String kvPairConcat : parameterKVPairs)
     		{
     			String[] kvPairSplit = kvPairConcat.split("=");
-    			System.out.println("Got KV " + kvPairConcat + " which is " + (kvPairSplit.length == 2 ? "a" : "not a") + " valid param.");
     			if(kvPairSplit.length == 2)
     				urlParameterMap.put(kvPairSplit[0], kvPairSplit[1]);
     		}

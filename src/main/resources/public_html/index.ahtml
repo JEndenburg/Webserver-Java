@@ -15,23 +15,18 @@
                     So yeah, welcome to my site. My name is DJ Fluffypuffkins.
                     <%
                         PRINT "<div class=\"result\">"
-                        PRINT "You have: "
-                        PRINT 15
-                        PRINT " eggs, which cost €"
-                        PRINT 2.50
-                        PRINT ".<br/>Also, par0 is named "
-                        PRINT $URL_PARS @0 @0
-                        PRINT " with the value "
-                        PRINT $URL_PARS @0 @1
-                        PRINT ".<br/>And par1 is named "
-                        PRINT $URL_PARS @1 @0
-                        PRINT " with the value "
-                        PRINT $URL_PARS @1 @1
-                        PRINT ".<br/>Finally, par3 is named "
-                        PRINT $URL_PARS @2 @0
-                        PRINT " with the value "
-                        PRINT $URL_PARS @2 @1
-                        PRINT "."
+                        DEFINE STR $name
+                        DEFINE INT $age
+                        DEFINE FLT $height
+
+                        PRINT "A person named "
+                        PRINT $name
+                        PRINT " age "
+                        PRINT $age
+                        PRINT " who is "
+                        PRINT $height
+                        PRINT "cm tall."
+
                         PRINT "</div>"
                     %>
                 </div>

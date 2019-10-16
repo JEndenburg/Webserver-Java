@@ -1,10 +1,22 @@
 package nl.sogyo.webserver.processing;
 
+import java.lang.reflect.InvocationTargetException;
+
 import nl.sogyo.webserver.processing.methods.*;
 
 public enum AHTMLMethod
 {
-	PRINT("PRINT", (page, pars) -> {return pars[0] == null ? "null" : pars[0].toString(); })
+	PRINT("PRINT", (page, pars) -> {return pars[0] == null ? "null" : pars[0].toString(); }),
+	
+	DEFINE("DEFINE", (page, pars) -> {
+		AHTMLValueType type = AHTMLValueType.fromName(pars[0].toString());
+		Object defaultValue = type.getDefaultValue();
+		if(type.isArray())
+			defaultValue = new Object[Integer.parseInt((String)pars[2])];
+		page.addVariable(pars[1].toString(), defaultValue);
+		return null;
+		}),
+	
 	;
 	
 	private final String methodName;

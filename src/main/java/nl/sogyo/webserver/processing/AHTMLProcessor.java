@@ -121,10 +121,29 @@ public class AHTMLProcessor
 			parameterString = line.substring(nextSpaceIndex + 1);
 		}
 		AHTMLMethod method = AHTMLMethod.fromName(methodName);
+		Object[] parameters;
 		
-		Object[] parameters = getParameters(parameterString);
+		if(method == AHTMLMethod.DEFINE)
+			parameters = getDefineParameters(parameterString);
+		else
+			parameters = getParameters(parameterString);
 		
 		return method.execute(page, parameters);
+	}
+	
+	private Object[] getDefineParameters(String parameterString)
+	{
+		String[] splitParameterString = parameterString.split(parameterRegexPattern.pattern());
+		if(splitParameterString[1].startsWith("$"))
+		{
+			int arraySize = 0;
+			if(splitParameterString.length > 2)
+				arraySize = Integer.parseInt(splitParameterString[2]);
+			
+			return new Object[] { splitParameterString[0], splitParameterString[1].substring(1), arraySize };
+		}
+		else
+			return null;
 	}
 	
 	private Object[] getParameters(String parameterString)
