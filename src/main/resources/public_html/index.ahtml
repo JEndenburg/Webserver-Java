@@ -15,26 +15,12 @@
                     So yeah, welcome to my site. My name is DJ Fluffypuffkins.
                     <%
                         PRINT "<div class=\"result\">"
-                        DEFINE STR $myval
-
-                        PRINT "<br/>"
-                        SET $myval "Hello "
+                        DEFINE INT $myval
+                        SET $myval 15
                         PRINT $myval
-
-                        PRINT "<br/>"
-                        ADD $myval "World!"
                         PRINT $myval
-
-                        PRINT "<br/>"
-                        SUB $myval "o"
+                        SET $myval "Hello World"
                         PRINT $myval
-
-                        PRINT "<br/>"
-                        MUL $myval 2
-                        PRINT $myval
-
-                        PRINT "<br/>"
-                        DIV $myval 9
                         PRINT $myval
 
                         PRINT "</div>"

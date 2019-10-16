@@ -6,47 +6,47 @@ import nl.sogyo.webserver.processing.methods.*;
 
 public enum AHTMLMethod
 {
-	PRINT("PRINT", (page, pars) -> {return pars[0] == null ? "null" : pars[0].toString(); }),
+	PRINT("PRINT", (script, pars) -> {return pars[0] == null ? "null" : pars[0].toString(); }),
 	
-	DEFINE("DEFINE", (page, pars) -> {
+	DEFINE("DEFINE", (script, pars) -> {
 		AHTMLValueType type = AHTMLValueType.fromName(pars[0].toString());
 		Object defaultValue = type.getDefaultValue();
 		if(type.isArray())
 			defaultValue = new Object[Integer.parseInt((String)pars[2])];
-		page.addVariable(pars[1].toString(), defaultValue);
+		script.addVariable(pars[1].toString(), defaultValue);
 		return null;
 		}, ParameterRequestType.TypeAndVariableName),
 	
-	SET("SET", (page, pars) -> {
-		page.addVariable(pars[0].toString(), pars[1]);
+	SET("SET", (script, pars) -> {
+		script.addVariable(pars[0].toString(), pars[1]);
 		return null;
 	}, ParameterRequestType.VariableNameAndValues),
 	
-	ADD("ADD", (page, pars) -> {
-		Object val = page.getVariable(pars[0].toString());
+	ADD("ADD", (script, pars) -> {
+		Object val = script.getVariable(pars[0].toString());
 		val = MathHelper.addObjects(val, pars[1]);
-		page.addVariable(pars[0].toString(), val);
+		script.addVariable(pars[0].toString(), val);
 		return null;
 	}, ParameterRequestType.VariableNameAndValues),
 	
-	SUB("SUB", (page, pars) -> {
-		Object val = page.getVariable(pars[0].toString());
+	SUB("SUB", (script, pars) -> {
+		Object val = script.getVariable(pars[0].toString());
 		val = MathHelper.subtractObjects(val, pars[1]);
-		page.addVariable(pars[0].toString(), val);
+		script.addVariable(pars[0].toString(), val);
 		return null;
 	}, ParameterRequestType.VariableNameAndValues),
 
-	MUL("MUL", (page, pars) -> {
-		Object val = page.getVariable(pars[0].toString());
+	MUL("MUL", (script, pars) -> {
+		Object val = script.getVariable(pars[0].toString());
 		val = MathHelper.multiplyObjects(val, pars[1]);
-		page.addVariable(pars[0].toString(), val);
+		script.addVariable(pars[0].toString(), val);
 		return null;
 	}, ParameterRequestType.VariableNameAndValues),
 
-	DIV("DIV", (page, pars) -> {
-		Object val = page.getVariable(pars[0].toString());
+	DIV("DIV", (script, pars) -> {
+		Object val = script.getVariable(pars[0].toString());
 		val = MathHelper.divideObjects(val, pars[1]);
-		page.addVariable(pars[0].toString(), val);
+		script.addVariable(pars[0].toString(), val);
 		return null;
 	}, ParameterRequestType.VariableNameAndValues),
 	
@@ -83,9 +83,9 @@ public enum AHTMLMethod
 		return parameterRequestType;
 	}
 	
-	public String execute(AHTMLPage page, Object[] parameters)
+	public String execute(AHTMLScript script, Object[] parameters)
 	{
-		return executable.execute(page, parameters);
+		return executable.execute(script, parameters);
 	}
 	
 	public static enum ParameterRequestType

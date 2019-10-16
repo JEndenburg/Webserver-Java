@@ -1,8 +1,8 @@
 package nl.sogyo.webserver.processing.methods;
 
-import nl.sogyo.webserver.processing.AHTMLPage;
+import nl.sogyo.webserver.processing.AHTMLScript;
 
 public interface IExecutable
 {
-	String execute(AHTMLPage page, Object[] parameters);
+	String execute(AHTMLScript script, Object[] parameters);
 }

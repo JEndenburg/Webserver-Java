@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,21 +13,22 @@ import nl.sogyo.webserver.ContentType;
 import nl.sogyo.webserver.HttpStatusCode;
 import nl.sogyo.webserver.input.Request;
 import nl.sogyo.webserver.output.Response;
+import nl.sogyo.webserver.processing.AHTMLScript.MethodCall;
 
 public class AHTMLProcessor
 {	
 	private static final Pattern parameterRegexPattern = Pattern.compile("\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)");
 	private boolean inCodeLine = false;
-	private AHTMLPage page;
+	private AHTMLScript script;
 	
 	private AHTMLProcessor(Request request)
 	{
-		page = new AHTMLPage();
+		script = new AHTMLScript();
 		
 		List<String[]> urlParameters = new ArrayList<>();
 		for(String parName : request.getParameterNames())
 			urlParameters.add(new String[] { parName, request.getParameterValue(parName) });
-		page.addVariable("URL_PARS", urlParameters.toArray(Object[]::new));
+		script.addVariable("URL_PARS", urlParameters.toArray(Object[]::new));
 	}
 	
 	public static Response processResponse(File file, Request request)
@@ -123,30 +125,32 @@ public class AHTMLProcessor
 		AHTMLMethod method = AHTMLMethod.fromName(methodName);
 		Object[] parameters;
 		
+		String[] splitParameterString = parameterString.split(parameterRegexPattern.pattern());
 		switch(method.getParameterRequestType())
 		{
 		default:
 		case Regular:
-			parameters = getParameters(parameterString);
+			parameters = getParameters(parameterString, splitParameterString);
 			break;
 		case TypeAndVariableName:
-			parameters = getTypeAndVariableNameParameters(parameterString);
+			parameters = getTypeAndVariableNameParameters(parameterString, splitParameterString);
 			break;
 		case VariableNameAndValues:
-			parameters = getVariableNameAndValuesParameters(parameterString);
+			parameters = getVariableNameAndValuesParameters(parameterString, splitParameterString);
 			break;
 		}
 		
-		return method.execute(page, parameters);
+		MethodCall methodCall = new MethodCall(method, parameters, splitParameterString);
+		return script.executeMethod(methodCall);
 	}
 	
-	private Object[] getVariableNameAndValuesParameters(String parameterString)
+	private Object[] getVariableNameAndValuesParameters(String parameterString, String[] splitParameterString)
 	{
-		String[] splitParameterString = parameterString.split(parameterRegexPattern.pattern());
 		if(splitParameterString[0].startsWith("$"))
 		{
 			String passingParameterString = parameterString.substring(splitParameterString[0].length() + 1);
-			Object[] valuedParameters = getParameters(passingParameterString);
+			String[] passingSplitParameterString = passingParameterString.split(parameterRegexPattern.pattern());
+			Object[] valuedParameters = getParameters(passingParameterString, passingSplitParameterString);
 			
 			Object[] returnValues = new Object[valuedParameters.length + 1];
 			System.arraycopy(valuedParameters, 0, returnValues, 1, valuedParameters.length);
@@ -157,9 +161,8 @@ public class AHTMLProcessor
 			return null;
 	}
 	
-	private Object[] getTypeAndVariableNameParameters(String parameterString)
+	private Object[] getTypeAndVariableNameParameters(String parameterString, String[] splitParameterString)
 	{
-		String[] splitParameterString = parameterString.split(parameterRegexPattern.pattern());
 		if(splitParameterString[1].startsWith("$"))
 		{
 			int arraySize = 0;
@@ -172,15 +175,14 @@ public class AHTMLProcessor
 			return null;
 	}
 	
-	private Object[] getParameters(String parameterString)
+	private Object[] getParameters(String parameterString, String[] splitParameterString)
 	{
-		String[] splitParameterString = parameterString.split(parameterRegexPattern.pattern());
 		List<Object> parameters = new ArrayList<Object>();
 		
 		int index = 0;
 		while(index < splitParameterString.length)
 		{
-			Object[] result = getParameterValue(splitParameterString, index);
+			Object[] result = getParameterValue(script, splitParameterString, index);
 			parameters.add(result[0]);
 			index = (int)result[1];
 		}
@@ -188,7 +190,7 @@ public class AHTMLProcessor
 		return parameters.toArray();
 	}
 	
-	private Object[] getParameterValue(String[] parameterStrings, int parameterIndex)
+	private static Object[] getParameterValue(AHTMLScript script, String[] parameterStrings, int parameterIndex)
 	{
 		Object value = null;
 		int indexShift = 1;
@@ -203,16 +205,12 @@ public class AHTMLProcessor
 		else if(isDoubleNumber(parameterStrings[parameterIndex]))
 			value = Double.parseDouble(parameterStrings[parameterIndex]);
 		else if(parameterStrings[parameterIndex].startsWith("$"))
-		{
-			Object[] result = getVariableValue(parameterStrings[parameterIndex].substring(1), parameterStrings, parameterIndex);
-			value = result[0];
-			indexShift += (int)result[1];
-		}
+			value = new AHTMLScript.VariableReference(parameterStrings[parameterIndex].substring(1));
 		
 		return new Object[] { value, parameterIndex + indexShift };
 	}
 	
-	private boolean isIntegerNumber(String string)
+	private static boolean isIntegerNumber(String string)
 	{
 		try
 		{
@@ -225,7 +223,7 @@ public class AHTMLProcessor
 		}
 	}
 	
-	private boolean isDoubleNumber(String string)
+	private static boolean isDoubleNumber(String string)
 	{
 		try
 		{
@@ -238,7 +236,7 @@ public class AHTMLProcessor
 		}
 	}
 	
-	private Object[] getVariableValue(Object value, String[] parameterStrings, int currentIndex)
+	public static Object[] getVariableValue(AHTMLScript script, Object value, String[] parameterStrings, int currentIndex)
 	{
 		int indexShift = 0;
 		
@@ -248,7 +246,7 @@ public class AHTMLProcessor
 			if(nextIndex < parameterStrings.length && parameterStrings[nextIndex].startsWith("@"))
 			{
 				parameterStrings[nextIndex] = parameterStrings[nextIndex].substring(1);
-				Object[] nextValue = getParameterValue(parameterStrings, nextIndex);
+				Object[] nextValue = getParameterValue(script, parameterStrings, nextIndex);
 				int selectedIndex = (int)nextValue[0];
 				Object[] arrVal = (Object[])value;
 				if(selectedIndex < arrVal.length)
@@ -259,7 +257,7 @@ public class AHTMLProcessor
 				
 				if(value != null && !value.getClass().isPrimitive())
 				{
-					Object[] subValue = getVariableValue(value, parameterStrings, currentIndex + 1);
+					Object[] subValue = getVariableValue(script, value, parameterStrings, currentIndex + 1);
 					value = subValue[0];
 					indexShift += (int)subValue[1];
 				}
@@ -269,8 +267,8 @@ public class AHTMLProcessor
 		return new Object[] { value, indexShift };
 	}
 	
-	private Object[] getVariableValue(String variableName, String[] parameterStrings, int currentIndex)
+	private static Object[] getVariableValue(AHTMLScript script, String variableName, String[] parameterStrings, int currentIndex)
 	{
-		return getVariableValue(page.getVariable(variableName), parameterStrings, currentIndex);
+		return getVariableValue(script, script.getVariable(variableName), parameterStrings, currentIndex);
 	}
 }
