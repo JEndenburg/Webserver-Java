@@ -1,42 +1,3 @@
-<%
-DEFINE ARR $messageArray
-DEFINE INT $messageIndex
-DEFINE STR $currentMessage
-
-STARTINIT
-
-LABEL "SaveMsg"
-    GOTO "LoadMessages"
-    ARRAY_ADD $messageArray $BODY:message
-    TAKE_STATIC $messageArray "messages"
-BREAK
-
-LABEL "LoadMessages"
-    GIVE_STATIC $messageArray "messages"
-    ISNULL $messageArray
-        DEFINE ARR $messageArray
-BREAK
-
-LABEL "NextMessage"
-    GIVE_ARRAY_VALUE $currentMessage $messageArray $messageIndex
-    ADD $messageIndex 1
-BREAK
-
-LABEL "PrintCurrentMessage"
-    PRINT "<div class=\"chat-message\">"
-    PRINT $currentMessage
-    PRINT "</div>"
-BREAK
-
-ENDINIT
-
-
-ISNOTNULL $BODY:message
-    GOTO "SaveMsg"
-GOTO "LoadMessages"
-%>
-
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -50,23 +11,14 @@ GOTO "LoadMessages"
             <div id="sitename">My Site!</div>
         </header>
         <main>
-            <div id="chat-box">
-
-                <%
-                    LABEL "PrintMessageLoop"
-                    GOTO "NextMessage"
-                    ISNOTNULL $currentMessage
-                        GOTO "PrintCurrentMessage"
-                    ISNOTNULL $currentMessage
-                        GOTO "PrintMessageLoop"
-                %>
-
-            </div>
-            <form id="chat-form" method="post">
-                <div class="input-container"><input type="text" name="message"></div>
+            <div id="chat-box"></div>
+            <form id="chat-form" action="javascript:;" onsubmit="sendMessage()">
+                <div class="input-container"><input id="chat-input-field" type="text" name="message"></div>
                 <div class="input-container"><input type="submit" value="Send!"></div>
             </form>
         </main>
+
+        <script src="chat.js"></script> 
 
     </body>
 </html>

@@ -1,0 +1,97 @@
+<%
+DEFINE INT $messageArrayLength
+DEFINE INT $messageIndex
+
+DEFINE ARR $messageArray
+DEFINE ARR $colorIdArray
+DEFINE ARR $ipArray
+DEFINE ARR $hashArray
+
+DEFINE STR $currentMessage
+DEFINE STR $currentColorId
+DEFINE STR $currentIp
+DEFINE STR $currentHash
+
+STARTINIT
+
+LABEL "SaveMsg"
+    CALL "LoadMessages"
+    ARRAY_ADD $messageArray $BODY:message
+    ARRAY_ADD $colorIdArray $BODY:cid
+    ARRAY_ADD $ipArray $BODY:ip
+    ARRAY_ADD $hashArray $BODY:hash
+    GIVE_ARRAY_LENGTH $messageArrayLength $messageArray
+
+    ISABOVE $messageArrayLength 15
+        ARRAY_REMOVEAT $messageArray 0
+    ISABOVE $messageArrayLength 15
+        ARRAY_REMOVEAT $colorIdArray 0
+    ISABOVE $messageArrayLength 15
+        ARRAY_REMOVEAT $ipArray 0
+    ISABOVE $messageArrayLength 15
+        ARRAY_REMOVEAT $hashArray 0
+
+    TAKE_STATIC $messageArray "messages"
+    TAKE_STATIC $colorIdArray "colorIds"
+    TAKE_STATIC $ipArray "ips"
+    TAKE_STATIC $hashArray "hashes"
+ENDCALL
+
+LABEL "LoadMessages"
+    GIVE_STATIC $messageArray "messages"
+    GIVE_STATIC $colorIdArray "colorIds"
+    GIVE_STATIC $ipArray "ips"
+    GIVE_STATIC $hashArray "hashes"
+    ISNULL $messageArray
+        DEFINE ARR $messageArray
+    ISNULL $colorIdArray
+        DEFINE ARR $colorIdArray
+    ISNULL $ipArray
+        DEFINE ARR $ipArray
+    ISNULL $hashArray
+        DEFINE ARR $hashArray
+    
+    GIVE_ARRAY_LENGTH $messageIndex $messageArray
+ENDCALL
+
+LABEL "NextMessage"
+    GIVE_ARRAY_VALUE $currentMessage $messageArray $messageIndex
+    GIVE_ARRAY_VALUE $currentColorId $colorIdArray $messageIndex
+    GIVE_ARRAY_VALUE $currentIp $ipArray $messageIndex
+    GIVE_ARRAY_VALUE $currentHash $hashArray $messageIndex
+    SUB $messageIndex 1
+ENDCALL
+
+LABEL "PrintCurrentMessage"
+    PRINT "<div class=\"chat-message col-"
+    PRINT $currentColorId
+    PRINT "\">"
+
+    PRINT "<div class=\"chat-info\">"
+    PRINT "<span class=\"ip\">"
+    PRINT $currentIp
+    PRINT "</span>:<span class=\"hash\">"
+    PRINT $currentHash
+    PRINT "</span></div><br/><div class=\"message\">"
+
+    PRINT $currentMessage
+    PRINT "</div></div>"
+    PRINT "\n"
+ENDCALL
+
+ENDINIT
+
+
+ISNOTNULL $BODY:message
+    CALL "SaveMsg"
+CALL "LoadMessages"
+
+
+
+LABEL "PrintMessageLoop"
+CALL "NextMessage"
+ISNOTNULL $currentMessage
+    CALL "PrintCurrentMessage"
+ISABOVE $messageIndex -1
+    CALL "PrintMessageLoop"
+%>

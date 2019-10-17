@@ -4,7 +4,7 @@ import nl.sogyo.webserver.processing.methods.*;
 
 public enum AHTMLMethod
 {
-	PRINT("PRINT", (script, pars) -> {return pars[0] == null ? "null" : pars[0].toString(); }),
+	PRINT("PRINT", (script, pars) -> {return pars[0] == null ? "null" : pars[0].toString().replace("\\n", "\n"); }),
 	
 	DEFINE("DEFINE", (script, pars) -> {
 		AHTMLValueType type = AHTMLValueType.fromName(pars[0].toString());
@@ -88,7 +88,7 @@ public enum AHTMLMethod
 		return null;
 	}),
 	
-	GOTO("GOTO", (script, pars) -> {
+	CALL("CALL", (script, pars) -> {
 		return script.executeFromPosition(script.getLabelPosition(pars[0].toString()));
 	}),
 	
@@ -107,7 +107,7 @@ public enum AHTMLMethod
 		return null;
 	}),
 	
-	BREAK("BREAK", (script, pars) -> null),
+	ENDCALL("ENDCALL", (script, pars) -> null),
 	
 	ARRAY_ADD("ARRAY_ADD", (script, pars) -> {
 		Object[] srcArray = (Object[]) script.getVariable(pars[0].toString());

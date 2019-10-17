@@ -74,7 +74,7 @@ public class AHTMLScript
 			if(!skipNextLine)
 			{
 				MethodCall methodCall = script.get(position);
-				if(methodCall.method == AHTMLMethod.BREAK)
+				if(methodCall.method == AHTMLMethod.ENDCALL)
 				{
 					rerun = false;
 					return sb.toString();
